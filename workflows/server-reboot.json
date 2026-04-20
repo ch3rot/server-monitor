@@ -1,0 +1,99 @@
+{
+  "name": "Server Reboot Notification",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "server-reboot",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "server-reboot"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "ok"
+      },
+      "id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [460, 180]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true },
+          "conditions": [
+            {
+              "id": "cond1",
+              "leftValue": "={{ $json.event }}",
+              "rightValue": "imminent",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ]
+        }
+      },
+      "id": "cccccccc-cccc-cccc-cccc-cccccccccccc",
+      "name": "Is Imminent?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [460, 420]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "⚠️ <b>Servidor reiniciando</b>\n\nEl servidor se reiniciará en 60 segundos para mantenimiento programado.",
+        "additionalFields": { "parse_mode": "HTML" }
+      },
+      "id": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+      "name": "Telegram Imminent",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [700, 300],
+      "credentials": {
+        "telegramApi": { "id": "", "name": "Telegram Bot" }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "✅ <b>Servidor reiniciado</b>\n\nEl servidor ha vuelto a estar operativo.",
+        "additionalFields": { "parse_mode": "HTML" }
+      },
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee",
+      "name": "Telegram Online",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [700, 540],
+      "credentials": {
+        "telegramApi": { "id": "", "name": "Telegram Bot" }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          { "node": "Respond", "type": "main", "index": 0 },
+          { "node": "Is Imminent?", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Is Imminent?": {
+      "main": [
+        [{ "node": "Telegram Imminent", "type": "main", "index": 0 }],
+        [{ "node": "Telegram Online", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "staticData": null,
+  "tags": []
+}

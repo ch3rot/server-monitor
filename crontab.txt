@@ -1,0 +1,6 @@
+# Instalar con: sudo crontab -e
+# Variables de entorno necesarias en /etc/environment o exportadas antes
+
+*/10 * * * * TELEGRAM_CHAT_ID=<your_chat_id> /usr/local/bin/server-monitor.sh
+0 4 */3 * * TELEGRAM_CHAT_ID=<your_chat_id> /usr/local/bin/server-reboot.sh
+@reboot TELEGRAM_CHAT_ID=<your_chat_id> /usr/local/bin/server-online.sh
